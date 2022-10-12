@@ -3,13 +3,16 @@ import hashlib
 import json
 from datetime import datetime
 from urllib.parse import urlparse
+from uuid import uuid4
 
 class DDRCoin:
     def __init__(self):
         self.name = None
+        self.uuid = str(uuid4()).replace('-', '')
         self.chain = []
         self.transactions = []
         self.nodes = set()
+        self.validated = False
         self.create_block(1, '0')
 
     def set_name(self, name):
@@ -33,6 +36,7 @@ class DDRCoin:
         }
         self.transactions = []
         self.chain.append(block)
+        self.validated = False
         return block
 
     def get_previous_block(self):
@@ -60,6 +64,7 @@ class DDRCoin:
                     temp_chain_length = len(temp_chain)
                     if temp_chain_length > chain_length:
                         chain = self.chain = temp_chain
+                        self.validated = False
             except Exception:
                 continue
         return bool(chain)
@@ -77,9 +82,24 @@ class DDRCoin:
         return hashlib.sha256(json.dumps(block, sort_keys=True).encode()).hexdigest()
 
     def is_chain_valid(self):
+        self.validated = True
         previous_block = self.chain[0]
         for block in self.chain[1:]:
             if (block['previous_hash'] != self.hash(previous_block)) or (block['proof'] != self.proof_of_work(previous_block['proof'])):
                 return False
             previous_block = block
         return True
+    
+    def is_validated(self):
+        return self.validated
+
+    def is_first_validator(self):
+        validation_of_nodes = []
+        for node in self.nodes:
+            try:
+                validation_of_nodes.append(requests.get(f'http://{node}/is_validated').json())
+            except Exception:
+                continue
+        if self.validated and not all(validation_of_nodes):
+            return True
+        return False
