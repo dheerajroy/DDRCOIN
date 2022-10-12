@@ -1,4 +1,3 @@
-from typing import List,Dict
 from fastapi import FastAPI
 from DDRCoin import DDRCoin
 
@@ -18,14 +17,6 @@ def connect_node(address):
 def nodes():
     return ddrcoin.nodes
 
-@app.post('/add_transaction')
-def add_transaction(sender, receiver, amount:float):
-    return ddrcoin.add_transaction(sender=sender, receiver=receiver, amount=amount)
-
-@app.get('/transactions')
-def transactions():
-    return ddrcoin.transactions
-
 @app.post('/mine')
 def mine():
     previous_block = ddrcoin.get_previous_block()
@@ -35,6 +26,14 @@ def mine():
 @app.get('/chain')
 def chain():
     return ddrcoin.chain
+
+@app.post('/add_transaction')
+def add_transaction(sender, receiver, amount:float):
+    return ddrcoin.add_transaction(sender=sender, receiver=receiver, amount=amount)
+
+@app.get('/transactions')
+def transactions():
+    return ddrcoin.transactions
 
 @app.get('/is_chain_valid')
 def is_chain_valid():
