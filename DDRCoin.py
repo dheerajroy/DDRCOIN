@@ -47,7 +47,7 @@ class DDRCoin:
                 check_proof = True
             else:
                 proof += 1
-        return check_proof
+        return proof
 
     def replace_chain(self):
         chain_length = len(self.chain)
