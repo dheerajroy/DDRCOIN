@@ -31,7 +31,7 @@ class DDRCoin:
             'index': len(self.chain)+1,
             'timestamp': str(datetime.now()),
             'proof': proof,
-            'transaction': self.transactions,
+            'transactions': self.transactions,
             'previous_hash': previous_hash
         }
         self.transactions = []
@@ -75,11 +75,23 @@ class DDRCoin:
             'receiver': receiver,
             'amount': amount
         }
-        self.transactions.append(transaction)
-        return transaction
+        if (sender == self.name and self.calculate_balance() >= amount) or sender != self.name:
+            self.transactions.append(transaction)
+            return True
+        return False
 
     def hash(self, block):
         return hashlib.sha256(json.dumps(block, sort_keys=True).encode()).hexdigest()
+
+    def calculate_balance(self):
+        balance = 0
+        for block in self.chain:
+            for transaction in block['transactions']:
+                if transaction['sender'] == self.name:
+                    balance -= transaction['amount']
+                elif transaction['receiver'] == self.name:
+                    balance += transaction['amount']
+        return balance
 
     def is_chain_valid(self):
         self.validated = True

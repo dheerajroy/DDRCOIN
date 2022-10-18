@@ -20,7 +20,7 @@ def nodes():
 @app.post('/mine')
 def mine():
     previous_block = ddrcoin.get_previous_block()
-    add_transaction(sender=ddrcoin.uuid, receiver=ddrcoin.name, amount=1)
+    ddrcoin.add_transaction(sender=ddrcoin.uuid, receiver=ddrcoin.name, amount=1)
     return ddrcoin.create_block(proof=ddrcoin.proof_of_work(previous_block['proof']), previous_hash=ddrcoin.hash(previous_block))
 
 @app.get('/chain')
@@ -28,8 +28,9 @@ def chain():
     return ddrcoin.chain
 
 @app.post('/add_transaction')
-def add_transaction(sender, receiver, amount:float):
-    return ddrcoin.add_transaction(sender=sender, receiver=receiver, amount=amount)
+def add_transaction(receiver, amount:float):
+    return ddrcoin.add_transaction(sender=ddrcoin.name, receiver=receiver, amount=amount)
+
 
 @app.get('/transactions')
 def transactions():
