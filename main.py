@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from DDRCoin import DDRCoin
 
 
-app = FastAPI()
+app = FastAPI(title='DDRCOIN')
 ddrcoin = DDRCoin()
 
 @app.post('/set_name')
